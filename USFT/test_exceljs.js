@@ -2,9 +2,7 @@ let xtj = require('xls-to-json');
 let fs = require('fs');
 
 const INPUT_FILE = "resources/Tracking Title List 9-2-18.xls";
-const VARBS = ["FRANCHISE NAME", "TITLE+STAR", "DP TITLE"];
-let newRow = {};
-let result = [];
+const VARBS = ["TITLE+STAR", "FRANCHISE NAME", "DP TITLE"];
 
 function convertXLSToJSON(inputFile) {
     return xtj({
@@ -19,18 +17,32 @@ function convertXLSToJSON(inputFile) {
         }
     });
 }
-
 //convertXLSToJSON(INPUT_FILE);
+
 let rows = JSON.parse(fs.readFileSync('resources/output.json'));
-//console.log(rows[0]);
-for (let row of rows) {
-    for (let j of Object.keys(row)) {
-        if (!VARBS.includes(j)) {
-            delete row[j];
+function extractData(data) {
+    for (let i = 0; i < data.length; i++) {
+        for (let j of Object.keys(data[i])) {
+            if (!VARBS.includes(j)) {
+                delete data[i][j];
+            }
+        }
+        if (data[i][VARBS[0]] == "" && data[i][VARBS[1]] == "" && data[i][VARBS[2]] == "") {
+            data.splice(i, 1);
+            i--;
         }
     }
 }
 
-console.log(rows);
+extractData(rows);
+
+for (let i = 0; i < rows.length; i++) {
+    //BRANDNAMES
+    console.log(rows[i][VARBS[1]]);
+    //MLFULL    
+    //console.log(rows[i][VARBS[0]]);
+    //MLSHORT
+    //console.log(rows[i][VARBS[2]]);
+}
 
 
